@@ -11,7 +11,7 @@ namespace Mobo
         {
             Member = member;
             StartTime = startTime;
-            EndTime = startTime.AddMinutes(5);
+            EndTime = startTime.AddMinutes(15);
         }
 
     }

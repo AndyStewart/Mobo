@@ -24,6 +24,17 @@ namespace Mobo
         }
 
         public IList<string> Members { get; } = new List<string>();
+        public TimeSpan TimeLeft(DateTime now)
+        {
+            if (_currentTurn == null)
+                return TimeSpan.FromMinutes(15);
+            while (_currentTurn.EndTime < now)
+            {
+                _currentTurn = NextPersonsTurn(_currentTurn.Member);
+            }
+
+            return _currentTurn.EndTime.Subtract(now);
+        }
 
         public string WhosTurnIsIt(DateTime dateTime)
         {

@@ -1,5 +1,14 @@
-﻿@functions {
+﻿@implements IDisposable
+
+@functions {
     private Mob _mob;
+    private Timer _timer;
+
+    protected override void OnInitialized() => _timer = new Timer(
+        async state => await InvokeAsync(StateHasChanged),
+        null,
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromSeconds(1));
     
     private void CreateMob()
     {
@@ -30,8 +39,11 @@
 
     private string ErrorMessage { get; set; }
 
+    public void Dispose() => _timer?.Dispose();
+
 }
 @page "/"
+@using System.Threading
 
 @if (_mob == null)
 {
@@ -73,6 +85,8 @@ else
         <div>    
             <button class="start-timer" @onclick="q => _mob.StartTimer(DateTime.Now)">Start</button>
         </div>
-
+        <div class="time-left">
+            @string.Format("{0:mm}:{0:ss}",_mob.TimeLeft(DateTime.Now))
+        </div>
     </div>
 }

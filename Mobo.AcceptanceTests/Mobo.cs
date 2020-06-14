@@ -85,5 +85,11 @@ namespace Mobo.AcceptanceTests
             var currentTurn = _index.Find(".current-turn").Text();
             Assert.Equal(memberName, currentTurn);
         }
+
+        public void TimeTillNextTurnIs(TimeSpan timeSpan)
+        {
+            var currentTurn = _index.Find(".time-left").Text().Trim();
+            Assert.Equal($"{timeSpan.Minutes}:{timeSpan.Seconds}", currentTurn);
+        }
     }
 }
