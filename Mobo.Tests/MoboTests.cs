@@ -52,7 +52,7 @@ namespace Mobo.Tests
         }
 
         [Fact]
-        public void After5MinutesTheTurnChangesToPlayer2()
+        public void After15MinutesTheTurnChangesToPlayer2()
         {
             var mob = new Mob("Mob 1");
             var player1 = "Andy";
@@ -61,7 +61,7 @@ namespace Mobo.Tests
             mob.AddMember(player2);
             mob.StartTimer(DateTime.Now);
             
-            Assert.Equal(player2, mob.WhosTurnIsIt(DateTime.Now.AddMinutes(6)));
+            Assert.Equal(player2, mob.WhosTurnIsIt(DateTime.Now.AddMinutes(16)));
         }
         
         [Fact]
@@ -77,7 +77,7 @@ namespace Mobo.Tests
         }
         
         [Fact]
-        public void PlayRotatesThroughPlayersEvery5Minutes()
+        public void PlayRotatesThroughPlayersEvery15Minutes()
         {
             var mob = new Mob("Mob 1");
             mob.AddMember("Andy");
@@ -85,9 +85,9 @@ namespace Mobo.Tests
             mob.AddMember("Kev");
             mob.StartTimer(DateTime.Now);
             Assert.Equal("Andy", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(0)));
-            Assert.Equal("Rob", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(5)));
-            Assert.Equal("Kev", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(10)));
-            Assert.Equal("Andy", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(15)));
+            Assert.Equal("Rob", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(15)));
+            Assert.Equal("Kev", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(30)));
+            Assert.Equal("Andy", mob.WhosTurnIsIt(DateTime.Now.AddMinutes(45)));
         }
     }
 }

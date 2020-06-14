@@ -1,5 +1,6 @@
-﻿@implements IDisposable
-
+﻿@using System.Threading
+@implements IDisposable
+@page "/"
 @functions {
     private Mob _mob;
     private Timer _timer;
@@ -42,8 +43,6 @@
     public void Dispose() => _timer?.Dispose();
 
 }
-@page "/"
-@using System.Threading
 
 @if (_mob == null)
 {
@@ -77,11 +76,11 @@ else
             <input type="text" class="member-name" @bind="MemberName"/>
             <button class="add-member" @onclick="AddMember">Add Member</button>
         </div>
+        
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
             <div class="error">@ErrorMessage</div>
         }
-
         <div>    
             <button class="start-timer" @onclick="q => _mob.StartTimer(DateTime.Now)">Start</button>
         </div>
