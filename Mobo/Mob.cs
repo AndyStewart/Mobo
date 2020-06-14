@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Linq;
-using System.Reflection;
 
 namespace Mobo
 {
     public class Mob
     {
-        private DateTime startTime;
-        private Turn currentTurn;
+        private DateTime _startTime;
+        private Turn _currentTurn;
 
         public Mob(string name) 
             => Name = !string.IsNullOrEmpty(name) 
@@ -30,12 +27,14 @@ namespace Mobo
 
         public string WhosTurnIsIt(DateTime dateTime)
         {
-            while (currentTurn.EndTime < dateTime)
+            if (_currentTurn == null)
+                return string.Empty;
+            while (_currentTurn.EndTime < dateTime)
             {
-               currentTurn = NextPersonsTurn(currentTurn.Member);
+               _currentTurn = NextPersonsTurn(_currentTurn.Member);
             }
 
-            return currentTurn.Member;
+            return _currentTurn.Member;
         }
 
         private Turn NextPersonsTurn(string previewTurn)
@@ -43,13 +42,13 @@ namespace Mobo
             var index = Members.IndexOf(previewTurn) + 1;
             if (index >= Members.Count)
                 index = 0;
-            return new Turn(currentTurn.EndTime, Members[index]);
+            return new Turn(_currentTurn.EndTime, Members[index]);
         }
         
         public void StartTimer(DateTime now)
         {
-            currentTurn = new Turn(now, Members[0]);
-            startTime = now;
+            _currentTurn = new Turn(now, Members[0]);
+            _startTime = now;
         }
     }
 }
