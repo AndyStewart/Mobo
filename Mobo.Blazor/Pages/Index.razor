@@ -1,5 +1,27 @@
 ﻿@page "/"
+@using System.Threading
 @functions {
-    
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(state => InvokeAsync(StateHasChanged), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private void StartTimer(MouseEventArgs obj) => _startTime = DateTime.Now;
+
+    private DateTime? _startTime;
+    private Timer _timer;
+
+    private void PauseTimer(MouseEventArgs obj)
+    {
+        _timer.Change(TimeSpan.FromDays(30), TimeSpan.FromDays(30));
+    }
 
 }
+<div class="timer">
+    @{
+        var timeLeft = _startTime?.AddMinutes(15).Subtract(DateTime.Now) ?? TimeSpan.FromMinutes(15);   
+    }
+    @string.Format("{0:mm}:{0:ss}", timeLeft)
+</div>
+<button class="start-timer" @onclick=StartTimer>Start</button>
+<button class="pause-timer" @onclick=PauseTimer>Pause</button>
