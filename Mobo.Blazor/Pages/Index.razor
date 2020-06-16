@@ -1,53 +1,39 @@
 ﻿@page "/"
 @using System.Threading
+@implements IDisposable
 @functions {
     private CountDownTimer _countDownTimer = new CountDownTimer(new Clock(), TimeSpan.FromMinutes(15));
     private Timer _uiRefreshTimer;
-    
+
     protected override void OnInitialized() 
         => _uiRefreshTimer = new Timer(state => InvokeAsync(StateHasChanged), null, TimeSpan.FromSeconds(0), TimeSpan.FromMilliseconds(100));
 
-    enum State
-    {
-        Stopped,
-        Paused,
-        Started
-    }
-    private State _state = State.Stopped;
-    private void StartTimer(MouseEventArgs obj)
-    {
-        _state = State.Started;
-        _countDownTimer.Start();
-    }
-
-    private void PauseTimer(MouseEventArgs obj)
-    {
-        _countDownTimer.Stop();
-        _state = State.Paused;
-    }
+    public void Dispose() => _uiRefreshTimer?.Dispose();
     
+    private void StartTimer(MouseEventArgs obj) => _countDownTimer.Start();
+
+    private void PauseTimer(MouseEventArgs obj) => _countDownTimer.Stop();
+
     private void ResumeTimer(MouseEventArgs obj)
     {
-        _state = State.Started;
-        var timeLeft = _countDownTimer.TimeLeft;
-        _countDownTimer = new CountDownTimer(new Clock(), timeLeft);
+        _countDownTimer = new CountDownTimer(new Clock(), _countDownTimer.TimeLeft);
         _countDownTimer.Start();
     }
 }
 <div class="timer">
     @_countDownTimer.ToString()
 </div>
-@if (_state == State.Stopped)
+@if (_countDownTimer.TimeLeft == _countDownTimer.TimerLength)
 {
     <button class="start-timer" @onclick=StartTimer>Start</button>   
 }
 
-@if (_state == State.Started)
+@if (_countDownTimer.TimeLeft < _countDownTimer.TimerLength && _countDownTimer.Running)
 {
     <button class="pause-timer" @onclick=PauseTimer>Pause</button>
 }
 
-@if (_state == State.Paused)
+@if (_countDownTimer.TimeLeft < _countDownTimer.TimerLength && !_countDownTimer.Running)
 {
     <button class="resume-timer" @onclick=ResumeTimer>Resume</button>
 }

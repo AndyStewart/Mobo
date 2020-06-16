@@ -45,6 +45,33 @@ namespace Mobo.Tests
         }
         
         [Fact]
+        public void CountDownTimerIsntRunningWhenInitialised()
+        {
+            var countDownTimer = new CountDownTimer(this, TimeSpan.FromMinutes(15));
+            countDownTimer.Start();
+            Assert.False(countDownTimer.Running);
+        }
+
+        [Fact]
+        public void CountDownTimerIsRunningWhenStarted()
+        {
+            var countDownTimer = new CountDownTimer(this, TimeSpan.FromMinutes(15));
+            countDownTimer.Start();
+            Now = Now.AddMinutes(1);
+            Assert.True(countDownTimer.Running);
+        }
+        
+        [Fact]
+        public void CountDownTimerIsntRunningWhenStopped()
+        {
+            var countDownTimer = new CountDownTimer(this, TimeSpan.FromMinutes(15));
+            countDownTimer.Start();
+            Now = Now.AddMinutes(1);
+            countDownTimer.Stop();
+            Assert.False(countDownTimer.Running);
+        }
+        
+        [Fact]
         public void CountDownToStringIsHHMM()
         {
             var countDownTimer = new CountDownTimer(this, TimeSpan.FromMinutes(15));
