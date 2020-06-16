@@ -20,11 +20,11 @@
         _countDownTimer.Start();
     }
 
-    private bool CountDownStarted() => _countDownTimer.TimeLeft == _countDownTimer.TimerLength;
+    private bool CountDownNotStarted() => _countDownTimer.TimeLeft == _countDownTimer.TimerLength;
 
-    private bool CountDownRunning() => _countDownTimer.TimeLeft < _countDownTimer.TimerLength && _countDownTimer.Running;
+    private bool CountDownRunning() => !CountDownNotStarted() && _countDownTimer.Running;
 
-    private bool CountDownPaused() => _countDownTimer.TimeLeft < _countDownTimer.TimerLength && !_countDownTimer.Running;
+    private bool CountDownPaused() => !CountDownNotStarted() && !_countDownTimer.Running;
 
 }
 <div class="container-fluid">
@@ -35,7 +35,7 @@
     </div>
     <div class="row justify-content-center">
         <div class="timer col-8 text-center">
-            @if (CountDownStarted())
+            @if (CountDownNotStarted())
             {
                 <button class="btn btn-primary start-timer" @onclick=StartTimer>Start</button>
             }
