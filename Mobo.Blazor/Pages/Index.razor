@@ -1,27 +1,69 @@
 ﻿@page "/"
 @using System.Threading
 @functions {
-    protected override void OnInitialized()
+
+    enum State
     {
-        _timer = new Timer(state => InvokeAsync(StateHasChanged), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+        Stopped,
+        Paused,
+        Started
+    }
+    private State _state = State.Stopped;
+    private void StartTimer(MouseEventArgs obj)
+    {
+        _timer = new Timer(state => InvokeAsync(UpdateTimer), null, TimeSpan.FromSeconds(0), TimeSpan.FromMilliseconds(100));
+        _state = State.Started;
+        _endTime = Clock.CurrentTime.AddMinutes(15);
     }
 
-    private void StartTimer(MouseEventArgs obj) => _startTime = DateTime.Now;
+    private void UpdateTimer()
+    {
+        StateHasChanged();
+    }
 
-    private DateTime? _startTime;
+    private TimeSpan TimeLeft()
+    {
+        if (_state != State.Started)
+            return _timeLeft;
+        if (_endTime < Clock.CurrentTime)
+            return TimeSpan.FromSeconds(0);
+        return _endTime.Subtract(Clock.CurrentTime);
+    }
+
     private Timer _timer;
 
     private void PauseTimer(MouseEventArgs obj)
     {
-        _timer.Change(TimeSpan.FromDays(30), TimeSpan.FromDays(30));
+        _timeLeft = TimeLeft();
+        _state = State.Paused;
+        _timer.Dispose();
+        _timer = null;
+    }
+    
+    private void ResumeTimer(MouseEventArgs obj)
+    {
+        _timer = new Timer(state => InvokeAsync(UpdateTimer), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+        _state = State.Started;
+        _endTime = Clock.CurrentTime.Add(_timeLeft);
     }
 
+    private DateTime _endTime;
+    private TimeSpan _timeLeft = TimeSpan.FromMinutes(15);
 }
 <div class="timer">
-    @{
-        var timeLeft = _startTime?.AddMinutes(15).Subtract(DateTime.Now) ?? TimeSpan.FromMinutes(15);   
-    }
-    @string.Format("{0:mm}:{0:ss}", timeLeft)
+    @string.Format("{0:mm}:{0:ss}", TimeLeft())
 </div>
-<button class="start-timer" @onclick=StartTimer>Start</button>
-<button class="pause-timer" @onclick=PauseTimer>Pause</button>
+@if (_state == State.Stopped)
+{
+    <button class="start-timer" @onclick=StartTimer>Start</button>   
+}
+
+@if (_state == State.Started)
+{
+    <button class="pause-timer" @onclick=PauseTimer>Pause</button>
+}
+
+@if (_state == State.Paused)
+{
+    <button class="resume-timer" @onclick=ResumeTimer>Resume</button>
+}

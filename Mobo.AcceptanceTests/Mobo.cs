@@ -17,6 +17,8 @@ namespace Mobo.AcceptanceTests
         {
             _ctx = new TestContext();
             _index = _ctx.RenderComponent<Index>();
+            Clock.Reset();
+            Clock.Pause();
         }
 
         public void Dispose() => _ctx?.Dispose();
@@ -24,20 +26,19 @@ namespace Mobo.AcceptanceTests
         public void TimeLeftOnTimerIs(TimeSpan timeLeft)
         {
             _index.Render();
-            var timeLeftText = _index.Find(".timer").Text();
-            Assert.Equal($"{timeLeft:mm}:{timeLeft:ss}", timeLeftText.Trim());
+            Assert.Equal(timeLeft, TimeLeft());
         }
 
         public async Task CountDownIsPaused()
         {
-            _index.Render();
             var timeLeftBefore = TimeLeft();
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Clock.MoveForward(TimeSpan.FromSeconds(5));
             Assert.Equal(timeLeftBefore, TimeLeft());
         }
 
-        private TimeSpan TimeLeft()
+        public TimeSpan TimeLeft()
         {
+            _index.Render();
             var timeLeft = _index.Find(".timer").Text();
             var timeParts = timeLeft.Split(':').Select(int.Parse).ToArray();
             return new TimeSpan(0, timeParts[0], timeParts[1]);
@@ -45,10 +46,11 @@ namespace Mobo.AcceptanceTests
 
         public async Task CountDownIsRunning()
         {
-            _index.Render();
             var timeLeftBefore = TimeLeft();
-            await Task.Delay(TimeSpan.FromSeconds(2));
-            Assert.True(TimeLeft() < timeLeftBefore);
+            await Clock.MoveForward(TimeSpan.FromSeconds(3));
+            _index.Render();
+            var timeLeft = TimeLeft();
+            Assert.Equal(timeLeftBefore.Subtract(TimeSpan.FromSeconds(3)),timeLeft);
         }
 
         public void StartTheTimer()
@@ -61,6 +63,36 @@ namespace Mobo.AcceptanceTests
         {
             _index.Render();
             _index.Find("button.pause-timer").Click();
+        }
+
+        public void TimerCantBeStarted()
+        {
+            _index.Render();
+            Assert.Empty(_index.FindAll("button.start-timer"));
+        }
+
+        public void TimerCantBeResumed()
+        {
+            _index.Render();
+            Assert.Empty(_index.FindAll("button.resume-timer"));
+        }
+
+        public void ResumeTimerResumesFrom(TimeSpan time)
+        {
+            _index.Find("button.resume-timer").Click();
+            _index.Render();
+            Assert.Equal(time, TimeLeft()); 
+        }
+
+        public void TimerCantBePaused()
+        {
+            _index.Render();
+            Assert.Empty(_index.FindAll("button.pause-timer"));
+        }
+
+        public void TimerCanBeStarted()
+        {
+            Assert.Equal(1, _index.FindAll("button.resume-timer").Count);
         }
     }
 }
