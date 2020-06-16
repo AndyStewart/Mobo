@@ -27,20 +27,28 @@
     private bool CountDownPaused() => _countDownTimer.TimeLeft < _countDownTimer.TimerLength && !_countDownTimer.Running;
 
 }
-<div class="timer">
-    @_countDownTimer.ToString()
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="timer col-8 text-center">
+            @_countDownTimer.ToString()
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="timer col-8 text-center">
+            @if (CountDownStarted())
+            {
+                <button class="btn btn-primary start-timer" @onclick=StartTimer>Start</button>
+            }
+
+            @if (CountDownRunning())
+            {
+                <button class="btn btn-primary pause-timer" @onclick=PauseTimer>Pause</button>
+            }
+
+            @if (CountDownPaused())
+            {
+                <button class="btn btn-primary resume-timer" @onclick=ResumeTimer>Resume</button>
+            }
+        </div>
+    </div>
 </div>
-@if (CountDownStarted())
-{
-    <button class="start-timer" @onclick=StartTimer>Start</button>   
-}
-
-@if (CountDownRunning())
-{
-    <button class="pause-timer" @onclick=PauseTimer>Pause</button>
-}
-
-@if (CountDownPaused())
-{
-    <button class="resume-timer" @onclick=ResumeTimer>Resume</button>
-}
