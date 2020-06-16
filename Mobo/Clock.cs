@@ -1,11 +1,9 @@
 using System;
-using System.Linq.Expressions;
-using System.Resources;
 using System.Threading.Tasks;
 
 namespace Mobo
 {
-    public class Clock
+    public class Clock : IClock
     {
         static Func<DateTime> _getDate = () => DateTime.Now;
         public static DateTime CurrentTime => _getDate();
@@ -20,5 +18,7 @@ namespace Mobo
             ReplaceTime(CurrentTime.Add(time));
             await Task.CompletedTask;
         }
+
+        public DateTime Now => CurrentTime;
     }
 }

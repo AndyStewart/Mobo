@@ -1,6 +1,11 @@
 ﻿@page "/"
 @using System.Threading
 @functions {
+    private CountDownTimer _countDownTimer = new CountDownTimer(new Clock(), TimeSpan.FromMinutes(15));
+    private Timer _uiRefreshTimer;
+    
+    protected override void OnInitialized() 
+        => _uiRefreshTimer = new Timer(state => InvokeAsync(StateHasChanged), null, TimeSpan.FromSeconds(0), TimeSpan.FromMilliseconds(100));
 
     enum State
     {
@@ -11,47 +16,26 @@
     private State _state = State.Stopped;
     private void StartTimer(MouseEventArgs obj)
     {
-        _timer = new Timer(state => InvokeAsync(UpdateTimer), null, TimeSpan.FromSeconds(0), TimeSpan.FromMilliseconds(100));
         _state = State.Started;
-        _endTime = Clock.CurrentTime.AddMinutes(15);
+        _countDownTimer.Start();
     }
-
-    private void UpdateTimer()
-    {
-        StateHasChanged();
-    }
-
-    private TimeSpan TimeLeft()
-    {
-        if (_state != State.Started)
-            return _timeLeft;
-        if (_endTime < Clock.CurrentTime)
-            return TimeSpan.FromSeconds(0);
-        return _endTime.Subtract(Clock.CurrentTime);
-    }
-
-    private Timer _timer;
 
     private void PauseTimer(MouseEventArgs obj)
     {
-        _timeLeft = TimeLeft();
+        _countDownTimer.Stop();
         _state = State.Paused;
-        _timer.Dispose();
-        _timer = null;
     }
     
     private void ResumeTimer(MouseEventArgs obj)
     {
-        _timer = new Timer(state => InvokeAsync(UpdateTimer), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         _state = State.Started;
-        _endTime = Clock.CurrentTime.Add(_timeLeft);
+        var timeLeft = _countDownTimer.TimeLeft;
+        _countDownTimer = new CountDownTimer(new Clock(), timeLeft);
+        _countDownTimer.Start();
     }
-
-    private DateTime _endTime;
-    private TimeSpan _timeLeft = TimeSpan.FromMinutes(15);
 }
 <div class="timer">
-    @string.Format("{0:mm}:{0:ss}", TimeLeft())
+    @_countDownTimer.ToString()
 </div>
 @if (_state == State.Stopped)
 {
