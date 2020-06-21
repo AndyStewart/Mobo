@@ -2,7 +2,7 @@
 @using System.Threading
 @implements IDisposable
 @functions {
-    private CountDownTimer _countDownTimer = new CountDownTimer(new Clock(), TimeSpan.FromMinutes(15));
+    private ICountDownTimer _countDownTimer = new CountDownTimer(new Clock(), TimeSpan.FromMinutes(15));
     private Timer _uiRefreshTimer;
 
     protected override void OnInitialized() 
@@ -10,21 +10,11 @@
 
     public void Dispose() => _uiRefreshTimer?.Dispose();
     
-    private void StartTimer(MouseEventArgs obj) => _countDownTimer.Start();
+    private void StartTimer(MouseEventArgs obj) => _countDownTimer=_countDownTimer.Start();
 
-    private void PauseTimer(MouseEventArgs obj) => _countDownTimer.Stop();
+    private void PauseTimer(MouseEventArgs obj) => _countDownTimer=_countDownTimer.Stop();
 
-    private void ResumeTimer(MouseEventArgs obj)
-    {
-        _countDownTimer = new CountDownTimer(new Clock(), _countDownTimer.TimeLeft);
-        _countDownTimer.Start();
-    }
-
-    private bool CountDownNotStarted() => _countDownTimer.TimeLeft == _countDownTimer.TimerLength;
-
-    private bool CountDownRunning() => !CountDownNotStarted() && _countDownTimer.Running;
-
-    private bool CountDownPaused() => !CountDownNotStarted() && !_countDownTimer.Running;
+    private void ResumeTimer(MouseEventArgs obj) => _countDownTimer = _countDownTimer.Start();
 
 }
 <div class="container-fluid">
@@ -35,17 +25,17 @@
     </div>
     <div class="row justify-content-center">
         <div class="timer col-8 text-center">
-            @if (CountDownNotStarted())
+            @if (_countDownTimer is CountDownTimer || _countDownTimer.TimeLeft == TimeSpan.Zero)
             {
                 <button class="btn btn-primary start-timer" @onclick=StartTimer>Start</button>
             }
 
-            @if (CountDownRunning())
+            @if (_countDownTimer is InProgressTimer)
             {
                 <button class="btn btn-primary pause-timer" @onclick=PauseTimer>Pause</button>
             }
 
-            @if (CountDownPaused())
+            @if (_countDownTimer is PausedTimer)
             {
                 <button class="btn btn-primary resume-timer" @onclick=ResumeTimer>Resume</button>
             }

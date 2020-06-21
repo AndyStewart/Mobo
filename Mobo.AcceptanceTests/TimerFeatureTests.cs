@@ -6,11 +6,13 @@ namespace Mobo.AcceptanceTests
 {
     public class TimerTests
     {
+        private readonly TimeSpan _defaultTimeLength = TimeSpan.FromMinutes(15);
+
         [Fact]
         public async Task DefaultTimerStartsAt15mins()
         {
             using var mobo = new Mobo();
-            mobo.TimeLeftOnTimerIs(TimeSpan.FromMinutes(15)); 
+            mobo.TimeLeftOnTimerIs(_defaultTimeLength); 
             await mobo.CountDownIsPaused();
         }
 
@@ -29,7 +31,7 @@ namespace Mobo.AcceptanceTests
         {
             using var mobo = new Mobo();
             mobo.StartTheTimer();
-            await Clock.MoveForward(TimeSpan.FromMinutes(15));
+            await Clock.MoveForward(_defaultTimeLength);
             await mobo.CountDownIsPaused();
         }
         
@@ -38,8 +40,7 @@ namespace Mobo.AcceptanceTests
         {
             using var mobo = new Mobo();
             mobo.StartTheTimer();
-            await Clock.MoveForward(TimeSpan.FromSeconds(5));
-            mobo.PauseTimer();
+             mobo.PauseTimer();
             await mobo.CountDownIsPaused();
             mobo.TimerCantBeStarted();
             mobo.TimerCantBePaused();
