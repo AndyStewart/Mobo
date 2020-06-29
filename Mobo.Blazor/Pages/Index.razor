@@ -20,9 +20,10 @@
         _countDownTimer = _countDownTimer.Start();
     }
 
-    private void PauseTimer(MouseEventArgs obj) => _countDownTimer=_countDownTimer.Stop();
+    private void PauseTimer(MouseEventArgs obj) => _countDownTimer = _countDownTimer.Stop();
 
     private void ResumeTimer(MouseEventArgs obj) => _countDownTimer = _countDownTimer.Start();
+    private void ResetTimer(MouseEventArgs obj) => _countDownTimer = new CountDownTimer(new Clock(), TimeSpan.FromMinutes(this.TimerLength));
 
     public int TimerLength { get; set; }
 }
@@ -38,22 +39,27 @@
             <div class="col-sm-4">
                 <input type="number" id="timer-length" class="form-control"
                        disabled="@(_countDownTimer is InProgressTimer)"
-                       @bind=TimerLength/>
+                       @bind=TimerLength />
             </div>
             <div class="col-sm-4">
                 @if (_countDownTimer is CountDownTimer || _countDownTimer.TimeLeft == TimeSpan.Zero)
                 {
-                    <button class="btn btn-primary start-timer" @onclick=StartTimer>Start</button>
+                    <button class="btn btn-primary" id="start-timer" @onclick=StartTimer>Start</button>
                 }
 
                 @if (_countDownTimer is InProgressTimer)
                 {
-                    <button class="btn btn-primary pause-timer" @onclick=PauseTimer>Pause</button>
+                    <button class="btn btn-primary" id="pause-timer" @onclick=PauseTimer>Pause</button>
                 }
 
                 @if (_countDownTimer is PausedTimer)
                 {
-                    <button class="btn btn-primary resume-timer" @onclick=ResumeTimer>Resume</button>
+                    <button class="btn btn-primary" id="resume-timer" @onclick=ResumeTimer>Resume</button>
+                }
+                
+                @if (_countDownTimer is InProgressTimer && _countDownTimer.TimeLeft > TimeSpan.Zero)
+                {
+                    <button type="button" class="btn btn-secondary" id="reset-timer" @onclick=ResetTimer>Reset</button>
                 }
             </div>
         </div>

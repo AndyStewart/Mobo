@@ -33,6 +33,7 @@ namespace Mobo.AcceptanceTests
             mobo.StartTheTimer(CountDownTimer.Default);
             await Clock.MoveForward(_defaultTimeLength);
             await mobo.CountDownIsPaused();
+            mobo.CountDownCantBeReset();
         }
         
         [Fact]
@@ -77,5 +78,18 @@ namespace Mobo.AcceptanceTests
             mobo.StartTheTimer(TimeSpan.FromMinutes(5));
             mobo.TimerCannotBeChanged();
         }
+
+                
+        [Fact]
+        public async Task ResetingTimerSetsTimeBackToOriginalTime()
+        {
+            using var mobo = new Mobo();
+            var customTimerLength = TimeSpan.FromMinutes(5);
+            mobo.StartTheTimer(customTimerLength);
+            await Clock.MoveForward(TimeSpan.FromMinutes(3));
+            mobo.ResetTimer();
+            mobo.TimeLeftOnTimerIs(customTimerLength);
+        }
+
     }
 }

@@ -14,10 +14,7 @@ namespace Mobo
             TimerLength = timerLength;
         }
 
-        public ICountDownTimer Start()
-        {
-            return new InProgressTimer(_clock, _clock.Now.Add(TimerLength));
-        }
+        public ICountDownTimer Start() => new InProgressTimer(_clock, _clock.Now.Add(TimerLength));
 
         public TimeSpan TimeLeft => TimerLength;
 
@@ -65,7 +62,6 @@ namespace Mobo
     public interface ICountDownTimer
     {
         TimeSpan TimeLeft { get; }
-        string ToString();
         ICountDownTimer Start();
         ICountDownTimer Stop();
     }
