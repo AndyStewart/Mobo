@@ -20,7 +20,7 @@ namespace Mobo.AcceptanceTests
         public async Task StartingTimerStartsTheCountdown()
         {
             using var mobo = new Mobo();
-            mobo.StartTheTimer();
+            mobo.StartTheTimer(CountDownTimer.Default);
             await mobo.CountDownIsRunning();
             mobo.TimerCantBeStarted();
             mobo.TimerCantBeResumed();
@@ -30,7 +30,7 @@ namespace Mobo.AcceptanceTests
         public async Task CountdownStopsAt0()
         {
             using var mobo = new Mobo();
-            mobo.StartTheTimer();
+            mobo.StartTheTimer(CountDownTimer.Default);
             await Clock.MoveForward(_defaultTimeLength);
             await mobo.CountDownIsPaused();
         }
@@ -39,7 +39,7 @@ namespace Mobo.AcceptanceTests
         public async Task PausingTheTimerPausesTheCountdown()
         {
             using var mobo = new Mobo();
-            mobo.StartTheTimer();
+            mobo.StartTheTimer(CountDownTimer.Default);
              mobo.PauseTimer();
             await mobo.CountDownIsPaused();
             mobo.TimerCantBeStarted();
@@ -51,7 +51,7 @@ namespace Mobo.AcceptanceTests
         public async Task ResumeAPausedTimer()
         {
             using var mobo = new Mobo();
-            mobo.StartTheTimer();
+            mobo.StartTheTimer(CountDownTimer.Default);
             await Clock.MoveForward(TimeSpan.FromSeconds(5));
             var time = mobo.TimeLeft();
             mobo.PauseTimer();
@@ -60,5 +60,22 @@ namespace Mobo.AcceptanceTests
             await mobo.CountDownIsRunning();
         }
 
+        [Fact]
+        public async Task TimerCanBeSetToACustomLength()
+        {
+            using var mobo = new Mobo();
+            var customTimerLength = TimeSpan.FromMinutes(5);
+            mobo.StartTheTimer(customTimerLength);
+            mobo.TimeLeftOnTimerIs(customTimerLength);
+            await mobo.CountDownIsRunning();
+        }
+        
+        [Fact]
+        public void TimerCanNotBeSetToACustomLengthWhileTimerIsRunning()
+        {
+            using var mobo = new Mobo();
+            mobo.StartTheTimer(TimeSpan.FromMinutes(5));
+            mobo.TimerCannotBeChanged();
+        }
     }
 }

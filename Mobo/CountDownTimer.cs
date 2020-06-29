@@ -4,6 +4,7 @@ namespace Mobo
 {
     public class CountDownTimer : ICountDownTimer
     {
+        public static readonly TimeSpan Default = new TimeSpan(0, 15, 0);
         private readonly IClock _clock;
         public TimeSpan TimerLength { get; }
 

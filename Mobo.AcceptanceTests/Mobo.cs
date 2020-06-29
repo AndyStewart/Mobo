@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using Xunit;
 using Index = Mobo.Blazor.Pages.Index;
 
@@ -53,9 +54,14 @@ namespace Mobo.AcceptanceTests
             Assert.Equal(timeLeftBefore.Subtract(TimeSpan.FromSeconds(3)),timeLeft);
         }
 
-        public void StartTheTimer()
+        public void StartTheTimer(TimeSpan timerLength)
         {
             _index.Render();
+            _index.Find("#timer-length")
+                  .Change(new ChangeEventArgs{Value = timerLength.Minutes.ToString()});
+            _index.Render();
+
+            var a = _index.Find("#timer-length").GetAttribute("value");
             _index.Find("button.start-timer").Click();
         }
 
@@ -90,9 +96,14 @@ namespace Mobo.AcceptanceTests
             Assert.Empty(_index.FindAll("button.pause-timer"));
         }
 
-        public void TimerCanBeStarted()
+        public void TimerCanBeStarted() 
+            => Assert.Equal(1, _index.FindAll("button.resume-timer").Count);
+
+        public void TimerCannotBeChanged()
         {
-            Assert.Equal(1, _index.FindAll("button.resume-timer").Count);
+            _index.Render();
+            var isDisabled = _index.Find("#timer-length").HasAttribute("disabled");
+            Assert.True(isDisabled, "Timer length not disabled");
         }
     }
 }
